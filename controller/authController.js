@@ -2,9 +2,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Users = require("../models").Users;
 const config = require("../config/app");
+const { error } = require("console");
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
+const login = async (request, response) => {
+  const { email, password } = request.body;
 
   try {
     const secure = require("crypto").randomBytes(64).toString("hex");
@@ -17,39 +18,39 @@ const login = async (req, res) => {
     });
     //  check if user found
 
-    if (!user) return res.status(404).json({ message: "User not Found" });
+    if (!user) return response.status(404).json({ message: "User not Found" });
 
     // check if password matches
 
     if (!bcrypt.compareSync(password, user.password))
-      return res.status(401).json({ message: "Incorrect Password" });
+      return response.status(401).json({ message: "Incorrect Password" });
 
     //   generate auth token
 
     const userwithToken = generateToken(user.get({ raw: true }));
-    return res.send(userwithToken);
-  } catch (e) {
-    return res.status(500).json({ message: e.message });
+    return response.send(userwithToken);
+  } catch (error) {
+    return response.status(500).json({ message: error.message });
   }
 
-  return res.send([email, password]);
+  return response.status(200);
 };
 
-const register = async (req, res) => {
+const register = async (request, response) => {
   
-const { email, password } = req.body;
+const { email, password } = request.body;
   try {
-    const user = await Users.create(req.body);
+    const user = await Users.create(request.body);
 
     const userwithToken = generateToken(user.get({ raw: true }));
-    return res.send(userwithToken);
-  } catch (e) {
-    return res.status(500).json({ message: e.message });
+    return response.send(userwithToken);
+  } catch (error) {
+    return response.status(500).json({ message: error.message });
   }
 };
 
 const generateToken = (user) => {
-  console.log(user);
+  ;
   delete user.password;
 
   const token = jwt.sign(user, config.appKey, { expiresIn: 86400 });

@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
-router.get("/home", (req, res) => {
-  return res.send("Home World!");
+router.get("/home", (request, response) => {
+  return response.send("Home World!");
 });
 
 router.use("/", require("./auth"));
